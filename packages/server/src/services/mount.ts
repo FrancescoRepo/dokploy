@@ -53,6 +53,9 @@ export const createMount = async (input: z.infer<typeof apiCreateMount>) => {
 				...(input.serviceType === "redis" && {
 					redisId: serviceId,
 				}),
+				...(input.serviceType === "sqlserver" && {
+					sqlserverId: serviceId,
+				}),
 			})
 			.returning()
 			.then((value) => value[0]);

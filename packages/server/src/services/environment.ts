@@ -188,6 +188,24 @@ export const findEnvironmentById = async (environmentId: string) => {
 					serverId: true,
 				},
 			},
+			sqlserver: {
+				with: {
+					server: {
+						columns: {
+							name: true,
+							serverId: true,
+						},
+					},
+				},
+				columns: {
+					sqlserverId: true,
+					name: true,
+					createdAt: true,
+					applicationStatus: true,
+					description: true,
+					serverId: true,
+				},
+			},
 			project: true,
 		},
 	});
@@ -213,6 +231,7 @@ export const findEnvironmentsByProjectId = async (projectId: string) => {
 			redis: true,
 			compose: true,
 			libsql: true,
+			sqlserver: true,
 			project: true,
 		},
 		columns: {
@@ -236,7 +255,8 @@ const environmentHasServices = (
 		(env.mongo?.length ?? 0) > 0 ||
 		(env.mysql?.length ?? 0) > 0 ||
 		(env.postgres?.length ?? 0) > 0 ||
-		(env.redis?.length ?? 0) > 0
+		(env.redis?.length ?? 0) > 0 ||
+		(env.sqlserver?.length ?? 0) > 0
 	);
 };
 
@@ -317,6 +337,7 @@ interface EnvironmentWithServices {
 	mysql: { mysqlId: string }[];
 	postgres: { postgresId: string }[];
 	redis: { redisId: string }[];
+	sqlserver: { sqlserverId: string }[];
 }
 
 export const filterEnvironmentServices = <T extends EnvironmentWithServices>(
@@ -347,6 +368,9 @@ export const filterEnvironmentServices = <T extends EnvironmentWithServices>(
 	),
 	redis: environment.redis.filter((db) =>
 		accessedServices.includes(db.redisId),
+	),
+	sqlserver: environment.sqlserver.filter((db) =>
+		accessedServices.includes(db.sqlserverId),
 	),
 });
 

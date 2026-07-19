@@ -118,6 +118,7 @@ export const environmentRouter = createTRPCRouter({
 		.input(z.object({ projectId: z.string() }))
 		.query(async ({ input, ctx }) => {
 			try {
+				console.log(input, ctx);
 				const environments = await findEnvironmentsByProjectId(input.projectId);
 
 				if (

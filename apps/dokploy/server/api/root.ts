@@ -43,6 +43,7 @@ import { scheduleRouter } from "./routers/schedule";
 import { securityRouter } from "./routers/security";
 import { serverRouter } from "./routers/server";
 import { settingsRouter } from "./routers/settings";
+import { sqlServerRouter } from "./routers/sqlserver";
 import { sshRouter } from "./routers/ssh-key";
 import { stripeRouter } from "./routers/stripe";
 import { swarmRouter } from "./routers/swarm";
@@ -83,6 +84,7 @@ export const appRouter = createTRPCRouter({
 	project: projectRouter,
 	redirects: redirectsRouter,
 	redis: redisRouter,
+	sqlserver: sqlServerRouter,
 	registry: registryRouter,
 	security: securityRouter,
 	server: serverRouter,

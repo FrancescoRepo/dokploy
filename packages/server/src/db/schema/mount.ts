@@ -11,6 +11,7 @@ import { mongo } from "./mongo";
 import { mysql } from "./mysql";
 import { postgres } from "./postgres";
 import { redis } from "./redis";
+import { sqlserver } from "./sqlserver";
 
 export const serviceType = pgEnum("serviceType", [
 	"application",
@@ -21,6 +22,7 @@ export const serviceType = pgEnum("serviceType", [
 	"redis",
 	"compose",
 	"libsql",
+	"sqlserver",
 ]);
 
 export type ServiceType = (typeof serviceType.enumValues)[number];
@@ -64,6 +66,9 @@ export const mounts = pgTable("mount", {
 	redisId: text("redisId").references(() => redis.redisId, {
 		onDelete: "cascade",
 	}),
+	sqlserverId: text("sqlserverId").references(() => sqlserver.sqlserverId, {
+		onDelete: "cascade",
+	}),
 });
 
 export const MountssRelations = relations(mounts, ({ one }) => ({
@@ -99,6 +104,10 @@ export const MountssRelations = relations(mounts, ({ one }) => ({
 		fields: [mounts.redisId],
 		references: [redis.redisId],
 	}),
+	sqlserver: one(sqlserver, {
+		fields: [mounts.sqlserverId],
+		references: [sqlserver.sqlserverId],
+	}),
 }));
 
 const createSchema = createInsertSchema(mounts, {
@@ -119,6 +128,7 @@ const createSchema = createInsertSchema(mounts, {
 		"redis",
 		"compose",
 		"libsql",
+		"sqlserver",
 	]),
 });
 

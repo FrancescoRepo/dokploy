@@ -13,6 +13,7 @@ import type { MongoNested } from "../databases/mongo";
 import type { MysqlNested } from "../databases/mysql";
 import type { PostgresNested } from "../databases/postgres";
 import type { RedisNested } from "../databases/redis";
+import type { SqlServerNested } from "../databases/sqlserver";
 import { execAsync, execAsyncRemote } from "../process/execAsync";
 import { spawnAsync } from "../process/spawnAsync";
 import { getRemoteDocker } from "../servers/remote-docker";
@@ -660,7 +661,8 @@ export const generateFileMounts = (
 		| MariadbNested
 		| MysqlNested
 		| PostgresNested
-		| RedisNested,
+		| RedisNested
+		| SqlServerNested,
 ) => {
 	const { mounts } = service;
 	const { APPLICATIONS_PATH } = paths(!!service.serverId);
