@@ -377,11 +377,11 @@ export const sqlServerRouter = createTRPCRouter({
 	update: protectedProcedure
 		.input(apiUpdateSqlServer)
 		.mutation(async ({ input, ctx }) => {
-			const { sqlServerId, ...rest } = input;
-			await checkServicePermissionAndAccess(ctx, sqlServerId, {
+			const { sqlserverId, ...rest } = input;
+			await checkServicePermissionAndAccess(ctx, sqlserverId, {
 				service: ["create"],
 			});
-			const sqlserver = await updateSqlServerById(sqlServerId, {
+			const sqlserver = await updateSqlServerById(sqlserverId, {
 				...rest,
 			});
 
@@ -395,7 +395,7 @@ export const sqlServerRouter = createTRPCRouter({
 			await audit(ctx, {
 				action: "update",
 				resourceType: "service",
-				resourceId: sqlServerId,
+				resourceId: sqlserverId,
 				resourceName: sqlserver.appName,
 			});
 			return true;

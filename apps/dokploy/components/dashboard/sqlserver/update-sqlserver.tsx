@@ -72,7 +72,7 @@ export const UpdateSqlServer = ({ sqlServerId }: Props) => {
   const onSubmit = async (formData: UpdateSqlServer) => {
     await mutateAsync({
       name: formData.name,
-      sqlServerId: sqlServerId,
+      sqlserverId: sqlServerId,
       description: formData.description || "",
     })
       .then(() => {

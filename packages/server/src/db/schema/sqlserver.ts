@@ -3,6 +3,7 @@ import { bigint, integer, json, pgTable, text } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { nanoid } from "nanoid";
 import { z } from "zod";
+import { backups } from "./backups";
 import { environments } from "./environment";
 import { mounts } from "./mount";
 import { server } from "./server";
@@ -87,6 +88,7 @@ export const sqlServerRelations = relations(sqlserver, ({ one, many }) => ({
 		fields: [sqlserver.environmentId],
 		references: [environments.environmentId],
 	}),
+	backups: many(backups),
 	mounts: many(mounts),
 	server: one(server, {
 		fields: [sqlserver.serverId],
@@ -182,7 +184,7 @@ export const apiResetSqlServer = createSchema
 export const apiUpdateSqlServer = createSchema
 	.partial()
 	.extend({
-		sqlServerId: z.string().min(1),
+		sqlserverId: z.string().min(1),
 		dockerImage: z.string().optional(),
 	})
 	.omit({ serverId: true });

@@ -1,6 +1,7 @@
 import { db } from "@dokploy/server/db";
 import {
 	type apiCreateSqlServer,
+	backups,
 	buildAppName,
 	sqlserver,
 } from "@dokploy/server/db/schema";
@@ -9,7 +10,7 @@ import { buildSqlServer } from "@dokploy/server/utils/databases/sqlserver";
 import { pullImage } from "@dokploy/server/utils/docker/utils";
 import { execAsyncRemote } from "@dokploy/server/utils/process/execAsync";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { eq, getTableColumns } from "drizzle-orm";
 import type { z } from "zod";
 import { validUniqueServerAppName } from "./project";
 
@@ -94,6 +95,25 @@ export const removeSqlServerById = async (sqlServerId: string) => {
 		.where(eq(sqlserver.sqlserverId, sqlServerId))
 		.returning();
 
+	return result[0];
+};
+
+export const findSqlServerByBackupId = async (backupId: string) => {
+	const result = await db
+		.select({
+			...getTableColumns(sqlserver),
+		})
+		.from(sqlserver)
+		.innerJoin(backups, eq(sqlserver.sqlserverId, backups.libsqlId))
+		.where(eq(backups.backupId, backupId))
+		.limit(1);
+
+	if (!result || !result[0]) {
+		throw new TRPCError({
+			code: "NOT_FOUND",
+			message: "SqlServer not found",
+		});
+	}
 	return result[0];
 };
 

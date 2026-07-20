@@ -217,6 +217,8 @@ export const SqlServerIcon = ({ className }: Props) => {
       viewBox="0 -141.54 1478.201 1478.201"
       xmlns="http://www.w3.org/2000/svg"
       fill="#000000"
+      width="40"
+      height="40"
       className={className}
     >
       <g id="SVGRepo_bgCarrier" stroke-width="0" />

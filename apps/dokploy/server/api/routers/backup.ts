@@ -15,6 +15,7 @@ import {
 	findPostgresByBackupId,
 	findPostgresById,
 	findServerById,
+	findSqlServerByBackupId,
 	IS_CLOUD,
 	keepLatestNBackups,
 	removeBackupById,
@@ -31,6 +32,7 @@ import {
 import { findDestinationById } from "@dokploy/server/services/destination";
 import { checkServicePermissionAndAccess } from "@dokploy/server/services/permission";
 import { runComposeBackup } from "@dokploy/server/utils/backups/compose";
+import { runSqlServerBackup } from "@dokploy/server/utils/backups/sqlserver";
 import {
 	getS3Credentials,
 	normalizeS3Path,
@@ -451,6 +453,33 @@ export const backupRouter = createTRPCRouter({
 				throw new TRPCError({
 					code: "BAD_REQUEST",
 					message: "Error running manual Libsql backup ",
+					cause: error,
+				});
+			}
+		}),
+	manualBackupSqlServer: protectedProcedure
+		.input(apiFindOneBackup)
+		.mutation(async ({ input, ctx }) => {
+			try {
+				const backup = await findBackupById(input.backupId);
+				if (backup.libsqlId) {
+					await checkServicePermissionAndAccess(ctx, backup.libsqlId, {
+						backup: ["create"],
+					});
+				}
+				const sqlserver = await findSqlServerByBackupId(backup.backupId);
+				await runSqlServerBackup(sqlserver, backup);
+				await keepLatestNBackups(backup, sqlserver?.serverId);
+				await audit(ctx, {
+					action: "run",
+					resourceType: "backup",
+					resourceId: backup.backupId,
+				});
+				return true;
+			} catch (error) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message: "Error running manual SqlServer backup ",
 					cause: error,
 				});
 			}

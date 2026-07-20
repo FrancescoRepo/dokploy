@@ -10,6 +10,7 @@ import { runMongoBackup } from "./mongo";
 import { runMySqlBackup } from "./mysql";
 import { runPostgresBackup } from "./postgres";
 import { redactRcloneCredentials } from "./redact";
+import { runSqlServerBackup } from "./sqlserver";
 import { runWebServerBackup } from "./web-server";
 
 export const scheduleBackup = (backup: BackupSchedule) => {
@@ -23,6 +24,7 @@ export const scheduleBackup = (backup: BackupSchedule) => {
 		mariadb,
 		libsql,
 		compose,
+		sqlserver,
 	} = backup;
 	scheduleJob(backupId, schedule, async () => {
 		if (backup.backupType === "database") {
@@ -44,6 +46,9 @@ export const scheduleBackup = (backup: BackupSchedule) => {
 			} else if (databaseType === "web-server") {
 				await runWebServerBackup(backup);
 				await keepLatestNBackups(backup);
+			} else if (databaseType === "sqlserver" && sqlserver) {
+				await runSqlServerBackup(sqlserver, backup);
+				await keepLatestNBackups(backup, sqlserver.serverId);
 			}
 		} else if (backup.backupType === "compose" && compose) {
 			await runComposeBackup(compose, backup);

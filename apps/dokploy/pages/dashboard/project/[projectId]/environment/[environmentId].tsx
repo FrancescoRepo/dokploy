@@ -238,7 +238,7 @@ export const extractServicesFromEnvironment = (
     environment.sqlserver?.map((item) => ({
       name: item.name,
       type: "sqlserver",
-      id: item.mysqlId,
+      id: item.sqlserverId,
       createdAt: item.createdAt,
       status: item.applicationStatus,
       description: item.description,

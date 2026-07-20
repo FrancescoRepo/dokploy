@@ -5,24 +5,32 @@ import { ShowClusterSettings } from "../application/advanced/cluster/show-cluste
 import { RebuildDatabase } from "./rebuild-database";
 
 interface Props {
-	id: string;
-	type: "libsql" | "mariadb" | "mongo" | "mysql" | "postgres" | "redis";
+  id: string;
+  type:
+    | "libsql"
+    | "mariadb"
+    | "mongo"
+    | "mysql"
+    | "postgres"
+    | "redis"
+    | "sqlserver";
 }
 
 export const ShowDatabaseAdvancedSettings = ({ id, type }: Props) => {
-	return (
-		<div className="flex w-full flex-col gap-5">
-			<ShowCustomCommand id={id} type={type} />
-			{type === "mariadb" ||
-			type === "mongo" ||
-			type === "mysql" ||
-			type === "postgres" ||
-			type === "redis" ? (
-				<ShowClusterSettings id={id} type={type} />
-			) : null}
-			<ShowVolumes id={id} type={type} />
-			<ShowResources id={id} type={type} />
-			<RebuildDatabase id={id} type={type} />
-		</div>
-	);
+  return (
+    <div className="flex w-full flex-col gap-5">
+      <ShowCustomCommand id={id} type={type} />
+      {type === "mariadb" ||
+      type === "mongo" ||
+      type === "mysql" ||
+      type === "postgres" ||
+      type === "redis" ||
+      type === "sqlserver" ? (
+        <ShowClusterSettings id={id} type={type} />
+      ) : null}
+      <ShowVolumes id={id} type={type} />
+      <ShowResources id={id} type={type} />
+      <RebuildDatabase id={id} type={type} />
+    </div>
+  );
 };

@@ -80,6 +80,7 @@ export const initCronJobs = async () => {
 			libsql: true,
 			user: true,
 			compose: true,
+			sqlserver: true,
 		},
 	});
 
@@ -120,7 +121,8 @@ const getServiceAppName = (backup: BackupSchedule): string => {
 		backup.mysql?.appName ||
 		backup.mariadb?.appName ||
 		backup.mongo?.appName ||
-		backup.libsql?.appName;
+		backup.libsql?.appName ||
+		backup.sqlserver?.appName;
 	return serviceAppName || backup.appName;
 };
 

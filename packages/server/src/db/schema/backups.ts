@@ -11,7 +11,7 @@ import {
 import { createInsertSchema } from "drizzle-zod";
 import { nanoid } from "nanoid";
 import { z } from "zod";
-import { generateAppName } from ".";
+import { generateAppName, sqlserver } from ".";
 import { compose } from "./compose";
 import { deployments } from "./deployment";
 import { destinations } from "./destination";
@@ -28,6 +28,7 @@ export const databaseType = pgEnum("databaseType", [
 	"mongo",
 	"web-server",
 	"libsql",
+	"sqlserver",
 ]);
 
 export const backupType = pgEnum("backupType", ["database", "compose"]);
@@ -80,6 +81,12 @@ export const backups = pgTable("backup", {
 	libsqlId: text("libsqlId").references((): AnyPgColumn => libsql.libsqlId, {
 		onDelete: "cascade",
 	}),
+	sqlserverId: text("sqlserverId").references(
+		(): AnyPgColumn => libsql.libsqlId,
+		{
+			onDelete: "cascade",
+		},
+	),
 	userId: text("userId").references(() => user.id),
 	// Only for compose backups
 	metadata: jsonb("metadata").$type<
@@ -128,6 +135,10 @@ export const backupsRelations = relations(backups, ({ one, many }) => ({
 		fields: [backups.libsqlId],
 		references: [libsql.libsqlId],
 	}),
+	sqlserver: one(sqlserver, {
+		fields: [backups.sqlserverId],
+		references: [sqlserver.sqlserverId],
+	}),
 	user: one(user, {
 		fields: [backups.userId],
 		references: [user.id],
@@ -154,12 +165,14 @@ const createSchema = createInsertSchema(backups, {
 		"mongo",
 		"web-server",
 		"libsql",
+		"sqlserver",
 	]),
 	postgresId: z.string().optional(),
 	mariadbId: z.string().optional(),
 	mysqlId: z.string().optional(),
 	mongoId: z.string().optional(),
 	libsqlId: z.string().optional(),
+	sqlserverId: z.string().optional(),
 	userId: z.string().optional(),
 	includeEncryptionKey: z.boolean().optional(),
 	metadata: z.any().optional(),
@@ -177,6 +190,7 @@ export const apiCreateBackup = createSchema.pick({
 	postgresId: true,
 	mongoId: true,
 	libsqlId: true,
+	sqlserverId: true,
 	databaseType: true,
 	userId: true,
 	backupType: true,
@@ -223,6 +237,7 @@ export const apiRestoreBackup = z.object({
 		"mongo",
 		"web-server",
 		"libsql",
+		"sqlserver",
 	]),
 	backupType: z.enum(["database", "compose"]),
 	databaseName: z.string().min(1),
@@ -249,6 +264,11 @@ export const apiRestoreBackup = z.object({
 				})
 				.optional(),
 			mysql: z
+				.object({
+					databaseRootPassword: z.string(),
+				})
+				.optional(),
+			sqlserver: z
 				.object({
 					databaseRootPassword: z.string(),
 				})
