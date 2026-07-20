@@ -15,7 +15,6 @@ import { validUniqueServerAppName } from "./project";
 
 export type SqlServer = typeof sqlserver.$inferSelect;
 
-// https://github.com/drizzle-team/drizzle-orm/discussions/1483#discussioncomment-7523881
 export const createSqlServer = async (
 	input: z.infer<typeof apiCreateSqlServer>,
 ) => {

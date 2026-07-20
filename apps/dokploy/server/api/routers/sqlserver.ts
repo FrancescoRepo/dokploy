@@ -97,7 +97,7 @@ export const sqlServerRouter = createTRPCRouter({
 					serviceId: newSqlServer.sqlserverId,
 					serviceType: "sqlserver",
 					volumeName: `${newSqlServer.appName}-data`,
-					mountPath: "/data",
+					mountPath: "/var/opt/mssql",
 					type: "volume",
 				});
 

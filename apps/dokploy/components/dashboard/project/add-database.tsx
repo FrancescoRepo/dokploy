@@ -164,6 +164,9 @@ const mySchema = z
     z
       .object({
         type: z.literal("sqlserver"),
+        dockerimage: z
+          .string()
+          .default("mcr.microsoft.com/mssql/server:2025-latest"),
         databaseRootPassword: z
           .string()
           .regex(/^[a-zA-Z0-9@#%^&*()_+\-=[\]{}|;:,.<>?~`]*$/, {
@@ -593,7 +596,8 @@ export const AddDatabase = ({ environmentId, projectName }: Props) => {
                 />
                 {(type === "mariadb" ||
                   type === "mysql" ||
-                  type === "postgres") && (
+                  type === "postgres" ||
+                  type === "sqlserver") && (
                   <FormField
                     control={form.control}
                     name="databaseName"
@@ -702,7 +706,8 @@ export const AddDatabase = ({ environmentId, projectName }: Props) => {
                   type === "mariadb" ||
                   type === "mongo" ||
                   type === "mysql" ||
-                  type === "postgres") && (
+                  type === "postgres" ||
+                  type === "sqlserver") && (
                   <FormField
                     control={form.control}
                     name="databaseUser"
@@ -743,7 +748,9 @@ export const AddDatabase = ({ environmentId, projectName }: Props) => {
                     </FormItem>
                   )}
                 />
-                {(type === "mariadb" || type === "mysql") && (
+                {(type === "mariadb" ||
+                  type === "mysql" ||
+                  type === "sqlserver") && (
                   <FormField
                     control={form.control}
                     name="databaseRootPassword"

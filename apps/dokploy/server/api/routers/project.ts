@@ -15,6 +15,7 @@ import {
 	createRedirect,
 	createRedis,
 	createSecurity,
+	createSqlServer,
 	deleteProject,
 	findApplicationById,
 	findComposeById,
@@ -26,6 +27,7 @@ import {
 	findPostgresById,
 	findProjectById,
 	findRedisById,
+	findSqlServerById,
 	findUserById,
 	IS_CLOUD,
 	updateProjectById,
@@ -63,6 +65,7 @@ import {
 	postgres,
 	projects,
 	redis,
+	sqlserver,
 } from "@/server/db/schema";
 
 export const projectRouter = createTRPCRouter({
@@ -284,6 +287,17 @@ export const projectRouter = createTRPCRouter({
 									applicationStatus: true,
 								},
 							},
+							sqlserver: {
+								where: buildServiceFilter(
+									sqlserver.sqlserverId,
+									accessedServices,
+								),
+								columns: {
+									sqlserverId: true,
+									name: true,
+									applicationStatus: true,
+								},
+							},
 							compose: {
 								where: buildServiceFilter(compose.composeId, accessedServices),
 								columns: {
@@ -355,6 +369,11 @@ export const projectRouter = createTRPCRouter({
 						libsql: {
 							columns: {
 								libsqlId: true,
+							},
+						},
+						sqlserver: {
+							columns: {
+								sqlserverId: true,
 							},
 						},
 					},
@@ -480,6 +499,17 @@ export const projectRouter = createTRPCRouter({
 									serverId: true,
 								},
 							},
+							sqlserver: {
+								columns: {
+									sqlserverId: true,
+									appName: true,
+									name: true,
+									createdAt: true,
+									applicationStatus: true,
+									description: true,
+									serverId: true,
+								},
+							},
 						},
 					},
 				},
@@ -578,6 +608,10 @@ export const projectRouter = createTRPCRouter({
 							where: applyFilter(redis.redisId),
 							columns: { applicationStatus: true },
 						},
+						sqlserver: {
+							where: applyFilter(sqlserver.sqlserverId),
+							columns: { applicationStatus: true },
+						},
 					},
 				},
 			},
@@ -605,7 +639,8 @@ export const projectRouter = createTRPCRouter({
 					env.mongo.length +
 					env.mysql.length +
 					env.postgres.length +
-					env.redis.length;
+					env.redis.length +
+					env.sqlserver.length;
 
 				for (const a of env.applications) bump(a.applicationStatus);
 				for (const c of env.compose) bump(c.composeStatus);
@@ -615,6 +650,7 @@ export const projectRouter = createTRPCRouter({
 				for (const s of env.mysql) bump(s.applicationStatus);
 				for (const s of env.postgres) bump(s.applicationStatus);
 				for (const s of env.redis) bump(s.applicationStatus);
+				for (const s of env.sqlserver) bump(s.applicationStatus);
 			}
 		}
 
@@ -801,6 +837,7 @@ export const projectRouter = createTRPCRouter({
 								"mysql",
 								"postgres",
 								"redis",
+								"sqlserver",
 							]),
 						}),
 					)
@@ -1183,6 +1220,35 @@ export const projectRouter = createTRPCRouter({
 										...rest,
 										serviceId: newRedis.redisId,
 										serviceType: "redis",
+									});
+								}
+
+								break;
+							}
+							case "sqlserver": {
+								const { sqlserverId, mounts, appName, ...sqlserver } =
+									await findSqlServerById(id);
+
+								const newAppName = appName.substring(
+									0,
+									appName.lastIndexOf("-"),
+								);
+
+								const newSqlServer = await createSqlServer({
+									...sqlserver,
+									appName: newAppName,
+									name: input.duplicateInSameProject
+										? `${sqlserver.name} (copy)`
+										: sqlserver.name,
+									environmentId: targetProject?.environmentId || "",
+								});
+
+								for (const mount of mounts) {
+									const { mountId, ...rest } = mount;
+									await createMount({
+										...rest,
+										serviceId: newSqlServer.sqlserverId,
+										serviceType: "sqlserver",
 									});
 								}
 
